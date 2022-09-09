@@ -1,15 +1,33 @@
 pipeline {
-   agent any
-   stages {
-    stage('Checkout') {
-      steps {
-        script {
-           // Do a ls -lart to view all the files are cloned. It will be clonned. This is just for you to be sure about it.
-           sh "ls -lart ./*" 
-           // List all branches in your repo. 
-           sh "git branch -a"
-          }
-       }
+    agent {
+        docker {
+            image 'maven:3.8.1-adoptopenjdk-11'
+            args '-v /root/.m2:/root/.m2'
+        }
     }
-  }
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn -B -DskipTests clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Deliver') { 
+            steps {
+                sh './jenkins/scripts/deliver.sh' 
+            }
+        }
+    }
 }
