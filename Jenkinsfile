@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                git 'https://github.com/gyamanoNisum/DevOpsAssignment1.git'
                 sh './mvnw clean compile'
             }
         }
