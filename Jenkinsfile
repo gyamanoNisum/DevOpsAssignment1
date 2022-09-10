@@ -21,7 +21,7 @@ pipeline {
         stage('Jar') {
             steps {
                 sh './mvnw package'
-                sh 'ls target/test-classes/'
+                sh 'ls target/'
             }
         }
     }
