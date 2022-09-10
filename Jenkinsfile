@@ -1,18 +1,30 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.1-adoptopenjdk-11'
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
-    options {
-        skipStagesAfterUnstable()
-    }
+    agent any
+
     stages {
         stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                git 'https://github.com/gyamanoNisum/DevOpsAssignment1.git'
+                sh './mvnw clean compile'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh './mvnw test'
+            }
+
+            post {
+                always {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                }
+            }
+        }
+        stage('Jar') {
+            steps {
+                sh './mvnw package'
+                sh 'ls target/test-classes/'
             }
         }
     }
+
 }
